@@ -2,23 +2,37 @@
 <html lang="en" dir="ltr" class="hydrated">
   <head>
     <meta charset="UTF-8" />
-    <title>Example Capacitor App</title>
+    <title>HealthFitness Example</title>
     <meta
       name="viewport"
       content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <meta name="format-detection" content="telephone=no" />
+    <style>
+      body { font-family: -apple-system, system-ui, sans-serif; margin: 1rem; }
+      button { display: block; width: 100%; padding: 0.9rem; margin: 0.4rem 0; font-size: 1rem; }
+      pre { background: #111; color: #0f0; padding: 0.75rem; border-radius: 6px;
+            white-space: pre-wrap; word-break: break-word; min-height: 6rem; }
+    </style>
   </head>
   <body>
     <main>
-      <h1>Capacitor Test Plugin Project</h1>
-      <p>
-        This project can be used to test out the functionality of your plugin. Nothing in the
-        <em>example-app/</em> folder will be published to npm when using this template, so you can create away!
-      </p>
-      <label for="echoInput">Echo Text:</label>
-      <input type="text" id="echoInput" name="echoInput" value="Hello World!" />
-      <button onclick="testEcho()">Click Me!</button>
+      <h1>@capacitor/health-fitness — example</h1>
+      <p>Exercises the full plugin API. Nothing in <em>example-app/</em> is published to npm.</p>
+
+      <button id="requestHealthPermissions">requestHealthPermissions()</button>
+      <button id="getData">getData()</button>
+      <button id="getWorkoutData">getWorkoutData()</button>
+      <button id="writeData">writeData()</button>
+      <button id="getLastRecord">getLastRecord()</button>
+      <button id="setBackgroundJob">setBackgroundJob()</button>
+      <button id="deleteBackgroundJob">deleteBackgroundJob()</button>
+      <button id="listBackgroundJobs">listBackgroundJobs()</button>
+      <button id="updateBackgroundJob">updateBackgroundJob()</button>
+      <button id="disconnectFromHealthConnect">disconnectFromHealthConnect()</button>
+      <button id="openHealthConnect">openHealthConnect()</button>
+
+      <pre id="out">Tap a method…</pre>
     </main>
 
     <script src="./js/example.js" type="module"></script>

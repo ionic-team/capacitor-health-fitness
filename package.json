@@ -9,11 +9,15 @@
   "files": [
     "android/src/main/",
     "android/build.gradle",
+    "android/NOTES.md",
     "dist/",
+    "hooks/",
     "ios/Sources",
     "ios/Tests",
+    "ios/NOTES.md",
     "Package.swift",
-    "CapacitorHealthFitness.podspec"
+    "CapacitorHealthFitness.podspec",
+    "CHANGELOG.md"
   ],
   "author": "Ionic Team <hi@ionic.io>",
   "license": "MIT",
@@ -43,7 +47,14 @@
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.mjs",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "capacitor:sync:after": "node hooks/capacitorCopyHealthFitnessConfigs.js"
+  },
+  "dependencies": {
+    "@xmldom/xmldom": "^0.9.0",
+    "@babel/core": "^7.27.0",
+    "@babel/preset-env": "^7.27.0",
+    "@babel/preset-typescript": "^7.27.0"
   },
   "devDependencies": {
     "@capacitor/android": "^8.0.0",
