@@ -11,7 +11,10 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "8.0.0"),
-        .package(path: "../ion-ios-healthfitness") // TEMP: local checkout has the representedClassName fix, not yet published to ionic-team/ion-ios-healthfitness - revert to the remote dependency once that's pushed/re-tagged
+        // TEMP: pinned to a pre-release tag on the fix/RMET-5336/minor-updates branch
+        // (not yet merged to main) - switch back to `from: "1.0.0"` once that PR merges
+        // and a real 1.0.1 (or later) is released.
+        .package(url: "https://github.com/ionic-team/ion-ios-healthfitness.git", exact: "1.0.1-beta.0")
     ],
     targets: [
         .target(
