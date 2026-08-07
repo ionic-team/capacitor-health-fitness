@@ -104,3 +104,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     `server.url`. The previous `capacitor.config.json` `server.url` +
     `HealthConnect_PrivacyPolicy.txt`-file derivation is now a fallback for
     apps that already serve their web content remotely.
+  - Android: restored the old Capacitor hook's fail-fast behavior for a
+    missing/malformed `strings.xml` when writing `privacy_policy_url` - an
+    earlier redesign pass had turned both cases into non-fatal `console.log`s,
+    which for the missing-file case silently masked a broken Android project
+    instead of failing the build immediately with a clear
+    `OUTSYSTEMS_PLUGIN_ERROR` message, matching the original.

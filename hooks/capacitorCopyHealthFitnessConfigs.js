@@ -371,8 +371,7 @@ function addEntryToManifest(manifestXmlDoc, permission) {
 function writePrivacyPolicyUrl(url) {
     const stringsPath = path.join(getAppDir(), 'app/src/main/res/values/strings.xml');
     if (!fs.existsSync(stringsPath)) {
-        console.log('HealthFitness: strings.xml not found, skipping privacy policy URL setup');
-        return;
+        throw new Error(`OUTSYSTEMS_PLUGIN_ERROR: ${stringsPath} file not found.`);
     }
 
     try {
@@ -382,8 +381,7 @@ function writePrivacyPolicyUrl(url) {
 
         const resourcesElement = stringsDoc.getElementsByTagName('resources')[0];
         if (!resourcesElement) {
-            console.log('HealthFitness: No <resources> element found in strings.xml, skipping privacy policy URL setup');
-            return;
+            throw new Error('OUTSYSTEMS_PLUGIN_ERROR: No <resources> element found in strings.xml.');
         }
 
         const privacyPolicyElement = findOrCreateStringElement(stringsDoc, resourcesElement, 'privacy_policy_url', '');
