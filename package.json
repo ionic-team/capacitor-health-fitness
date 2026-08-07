@@ -47,6 +47,7 @@
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.mjs",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
+    "prepare": "npm run build",
     "prepublishOnly": "npm run build",
     "capacitor:sync:after": "node hooks/capacitorCopyHealthFitnessConfigs.js"
   },
