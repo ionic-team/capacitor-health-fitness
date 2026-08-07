@@ -514,9 +514,13 @@ function findOrCreateStringElement(stringsDoc, resourcesElement, name, defaultVa
 // The Capacitor bridge (HealthFitnessPlugin.load()) reads these two string
 // resources unconditionally at plugin-load time (app startup), not just when
 // setBackgroundJob() is called - if they're missing, Resources.getString()
-// throws and the app crashes on launch. Matches the Cordova plugin's
-// androidCopyPreferencesPermissions.js copyNotificationContent() defaults and
-// BackgroundNotificationTitle/BackgroundNotificationDescription preferences.
+// throws and the app crashes on launch. Defaults match the Cordova plugin's
+// androidCopyPreferencesPermissions.js copyNotificationContent() and
+// BackgroundNotificationTitle/BackgroundNotificationDescription preferences,
+// but unlike that hook (which owns a dedicated os_healthfitness_strings.xml
+// it fully regenerates every run), this one writes into the app's shared
+// strings.xml - so it only fills in a value when one isn't already set,
+// matching setPrivacyPolicyUrl()'s convention for this same shared file.
 function copyNotificationContent(config) {
     const stringsPath = path.join(getAppDir(), 'app/src/main/res/values/strings.xml');
     if (!fs.existsSync(stringsPath)) {
@@ -538,8 +542,13 @@ function copyNotificationContent(config) {
 
     const titleElement = findOrCreateStringElement(stringsDoc, resourcesElement, 'background_notification_title', notificationTitle);
     const descriptionElement = findOrCreateStringElement(stringsDoc, resourcesElement, 'background_notification_description', notificationDescription);
-    titleElement.textContent = notificationTitle;
-    descriptionElement.textContent = notificationDescription;
+
+    if (!titleElement.textContent || titleElement.textContent.trim() === '') {
+        titleElement.textContent = notificationTitle;
+    }
+    if (!descriptionElement.textContent || descriptionElement.textContent.trim() === '') {
+        descriptionElement.textContent = notificationDescription;
+    }
 
     const serializer = new XMLSerializer();
     fs.writeFileSync(stringsPath, serializer.serializeToString(stringsDoc), 'utf-8');

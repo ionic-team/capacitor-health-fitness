@@ -86,7 +86,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     to the consuming app's `strings.xml` (missed when the hook was first
     ported - the plugin reads these unconditionally at load time, so their
     absence crashed the app on startup, not just when `setBackgroundJob` was
-    used).
+    used). This hook writes into the app's *shared* `strings.xml`, unlike the
+    Cordova plugin's equivalent (which owns a dedicated
+    `os_healthfitness_strings.xml` it fully regenerates every run) - so it
+    only fills in a value when one isn't already set, matching this same
+    hook's own `privacy_policy_url` convention, instead of unconditionally
+    overwriting an already-configured value on every `cap sync`.
   - Android: the hook now always ensures `privacy_policy_url` exists (as an
     empty placeholder when no real URL can be derived), instead of only
     creating it when a privacy-policy file is present. `getPrivacyPolicyUrl()`
