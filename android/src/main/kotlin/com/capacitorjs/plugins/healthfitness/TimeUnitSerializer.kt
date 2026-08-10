@@ -7,7 +7,7 @@ import com.google.gson.JsonParseException
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import io.ionic.libs.ionhealthfitnesslib.data.HealthEnumTimeUnit
+import com.outsystems.plugins.healthfitness.data.HealthEnumTimeUnit
 import java.lang.reflect.Type
 
 class TimeUnitSerializer(

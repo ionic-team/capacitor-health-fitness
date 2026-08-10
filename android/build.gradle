@@ -83,7 +83,7 @@ dependencies {
     implementation "androidx.core:core-ktx:$androidxCoreKTXVersion"
 
     // Shared native business logic - same library the Cordova plugin depends on.
-    implementation "io.ionic.libs:ionhealthfitness-android:1.0.0"
+    implementation "io.ionic.libs:ionhealthfitness-android:1.0.1"
 
     implementation "com.google.android.gms:play-services-auth:19.2.0"
     implementation "com.google.code.gson:gson:2.8.9"

@@ -5,21 +5,21 @@ import android.app.AlarmManager
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import io.ionic.libs.ionhealthfitnesslib.background.BackgroundJobParameters
-import io.ionic.libs.ionhealthfitnesslib.background.DatabaseManager
-import io.ionic.libs.ionhealthfitnesslib.background.UpdateBackgroundJobParameters
-import io.ionic.libs.ionhealthfitnesslib.data.Constants
-import io.ionic.libs.ionhealthfitnesslib.data.HealthEnumTimeUnit
-import io.ionic.libs.ionhealthfitnesslib.data.HealthRecord
-import io.ionic.libs.ionhealthfitnesslib.data.types.HealthAdvancedQueryParameters
-import io.ionic.libs.ionhealthfitnesslib.data.types.HealthFitnessGroupPermission
-import io.ionic.libs.ionhealthfitnesslib.data.types.HealthFitnessPermission
-import io.ionic.libs.ionhealthfitnesslib.helpers.ActivityTransitionHelper
-import io.ionic.libs.ionhealthfitnesslib.helpers.AlarmManagerHelper
-import io.ionic.libs.ionhealthfitnesslib.helpers.HealthConnectHelper
-import io.ionic.libs.ionhealthfitnesslib.repository.HealthConnectRepository
-import io.ionic.libs.ionhealthfitnesslib.viewmodel.HealthConnectDataManager
-import io.ionic.libs.ionhealthfitnesslib.viewmodel.HealthConnectViewModel
+import com.outsystems.plugins.healthfitness.background.BackgroundJobParameters
+import com.outsystems.plugins.healthfitness.background.DatabaseManager
+import com.outsystems.plugins.healthfitness.background.UpdateBackgroundJobParameters
+import com.outsystems.plugins.healthfitness.data.Constants
+import com.outsystems.plugins.healthfitness.data.HealthEnumTimeUnit
+import com.outsystems.plugins.healthfitness.data.HealthRecord
+import com.outsystems.plugins.healthfitness.data.types.HealthAdvancedQueryParameters
+import com.outsystems.plugins.healthfitness.data.types.HealthFitnessGroupPermission
+import com.outsystems.plugins.healthfitness.data.types.HealthFitnessPermission
+import com.outsystems.plugins.healthfitness.helpers.ActivityTransitionHelper
+import com.outsystems.plugins.healthfitness.helpers.AlarmManagerHelper
+import com.outsystems.plugins.healthfitness.helpers.HealthConnectHelper
+import com.outsystems.plugins.healthfitness.repository.HealthConnectRepository
+import com.outsystems.plugins.healthfitness.viewmodel.HealthConnectDataManager
+import com.outsystems.plugins.healthfitness.viewmodel.HealthConnectViewModel
 
 /**
  * Business logic - delegates directly to the shared `ion-android-healthfitness`

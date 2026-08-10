@@ -14,9 +14,9 @@ import com.getcapacitor.annotation.Permission
 import com.getcapacitor.annotation.PermissionCallback
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import io.ionic.libs.ionhealthfitnesslib.data.Constants.REQUEST_PERMISSION_ACTIVITY_KEY_HEALTH
-import io.ionic.libs.ionhealthfitnesslib.data.HealthFitnessError
-import io.ionic.libs.ionhealthfitnesslib.store.HealthStoreException
+import com.outsystems.plugins.healthfitness.data.Constants.REQUEST_PERMISSION_ACTIVITY_KEY_HEALTH
+import com.outsystems.plugins.healthfitness.data.HealthFitnessError
+import com.outsystems.plugins.healthfitness.store.HealthStoreException
 import org.json.JSONException
 
 /**
@@ -318,11 +318,11 @@ class HealthFitnessPlugin : Plugin() {
         val call = savedCall ?: return
 
         data?.let {
-            if (it.getBooleanExtra(io.ionic.libs.ionhealthfitnesslib.data.Constants.EXTRA_CONTAINS_READ_DATA_BACKGROUND, false)) {
+            if (it.getBooleanExtra(com.outsystems.plugins.healthfitness.data.Constants.EXTRA_CONTAINS_READ_DATA_BACKGROUND, false)) {
                 val granted = it.getIntExtra(
-                    io.ionic.libs.ionhealthfitnesslib.data.Constants.EXTRA_RESULT_PERMISSION_KEY_GLOBAL,
-                    io.ionic.libs.ionhealthfitnesslib.data.Constants.EXTRA_RESULT_PERMISSION_DENIED
-                ) == io.ionic.libs.ionhealthfitnesslib.data.Constants.EXTRA_RESULT_PERMISSION_GRANTED
+                    com.outsystems.plugins.healthfitness.data.Constants.EXTRA_RESULT_PERMISSION_KEY_GLOBAL,
+                    com.outsystems.plugins.healthfitness.data.Constants.EXTRA_RESULT_PERMISSION_DENIED
+                ) == com.outsystems.plugins.healthfitness.data.Constants.EXTRA_RESULT_PERMISSION_GRANTED
                 if (granted) {
                     setBackgroundJobWithParameters(call)
                 } else {
