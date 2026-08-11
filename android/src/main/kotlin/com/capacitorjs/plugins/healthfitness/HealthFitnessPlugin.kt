@@ -56,10 +56,6 @@ class HealthFitnessPlugin : Plugin() {
     private lateinit var foregroundNotificationTitle: String
     private lateinit var foregroundNotificationDescription: String
 
-    // Plugin.saveCall()/getSavedCall()/savedCall are deprecated (removed in
-    // Capacitor 9) in favor of Bridge.saveCall()/getSavedCall(), which key
-    // retained calls by callbackId rather than a single implicit slot on the
-    // Plugin instance - so the plugin tracks that id itself.
     private var savedCallbackId: String? = null
 
     private fun retainCall(call: PluginCall) {
