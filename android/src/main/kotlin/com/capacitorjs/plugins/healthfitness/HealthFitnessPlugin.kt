@@ -14,6 +14,10 @@ import com.getcapacitor.annotation.Permission
 import com.getcapacitor.annotation.PermissionCallback
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.outsystems.plugins.healthfitness.data.Constants.EXTRA_CONTAINS_READ_DATA_BACKGROUND
+import com.outsystems.plugins.healthfitness.data.Constants.EXTRA_RESULT_PERMISSION_DENIED
+import com.outsystems.plugins.healthfitness.data.Constants.EXTRA_RESULT_PERMISSION_GRANTED
+import com.outsystems.plugins.healthfitness.data.Constants.EXTRA_RESULT_PERMISSION_KEY_GLOBAL
 import com.outsystems.plugins.healthfitness.data.Constants.REQUEST_PERMISSION_ACTIVITY_KEY_HEALTH
 import com.outsystems.plugins.healthfitness.data.HealthFitnessError
 import com.outsystems.plugins.healthfitness.store.HealthStoreException
@@ -335,11 +339,11 @@ class HealthFitnessPlugin : Plugin() {
         val call = takeSavedCall() ?: return
 
         data?.let {
-            if (it.getBooleanExtra(com.outsystems.plugins.healthfitness.data.Constants.EXTRA_CONTAINS_READ_DATA_BACKGROUND, false)) {
+            if (it.getBooleanExtra(EXTRA_CONTAINS_READ_DATA_BACKGROUND, false)) {
                 val granted = it.getIntExtra(
-                    com.outsystems.plugins.healthfitness.data.Constants.EXTRA_RESULT_PERMISSION_KEY_GLOBAL,
-                    com.outsystems.plugins.healthfitness.data.Constants.EXTRA_RESULT_PERMISSION_DENIED
-                ) == com.outsystems.plugins.healthfitness.data.Constants.EXTRA_RESULT_PERMISSION_GRANTED
+                    EXTRA_RESULT_PERMISSION_KEY_GLOBAL,
+                    EXTRA_RESULT_PERMISSION_DENIED
+                ) == EXTRA_RESULT_PERMISSION_GRANTED
                 if (granted) {
                     setBackgroundJobWithParameters(call)
                 } else {
