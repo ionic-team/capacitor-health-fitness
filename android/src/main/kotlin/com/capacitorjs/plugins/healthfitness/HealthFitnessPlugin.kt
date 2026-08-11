@@ -56,6 +56,27 @@ class HealthFitnessPlugin : Plugin() {
     private lateinit var foregroundNotificationTitle: String
     private lateinit var foregroundNotificationDescription: String
 
+    // Plugin.saveCall()/getSavedCall()/savedCall are deprecated (removed in
+    // Capacitor 9) in favor of Bridge.saveCall()/getSavedCall(), which key
+    // retained calls by callbackId rather than a single implicit slot on the
+    // Plugin instance - so the plugin tracks that id itself.
+    private var savedCallbackId: String? = null
+
+    private fun retainCall(call: PluginCall) {
+        bridge.saveCall(call)
+        savedCallbackId = call.callbackId
+    }
+
+    private fun takeSavedCall(): PluginCall? {
+        val callbackId = savedCallbackId ?: return null
+        savedCallbackId = null
+        val call = bridge.getSavedCall(callbackId)
+        if (call != null) {
+            bridge.releaseCall(call)
+        }
+        return call
+    }
+
     override fun load() {
         implementation = HealthFitness(context)
         foregroundNotificationTitle = implementation.getForegroundNotificationTitle(context)
@@ -81,7 +102,7 @@ class HealthFitnessPlugin : Plugin() {
             // NOTE: workoutVariables is intentionally not read - the Cordova
             // plugin never parses this argument on Android either.
 
-            saveCall(call)
+            retainCall(call)
             implementation.healthConnectViewModel.initAndRequestPermissions(
                 activity,
                 customPermissions,
@@ -184,7 +205,7 @@ class HealthFitnessPlugin : Plugin() {
 
         if (!implementation.isActivityVariable(parameters.variable) && SDK_INT >= 31 && !implementation.canScheduleExactAlarms()) {
             implementation.requestingExactAlarmPermission = true
-            saveCall(call)
+            retainCall(call)
             context.startActivity(Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
         } else {
             requestBackgroundJobPermissions(call)
@@ -211,7 +232,7 @@ class HealthFitnessPlugin : Plugin() {
 
     private fun requestReadDataBackgroundPermission(call: PluginCall) {
         if (SDK_INT >= 35) {
-            saveCall(call)
+            retainCall(call)
             implementation.healthConnectViewModel.requestReadDataBackgroundPermission(activity)
         } else {
             setBackgroundJobWithParameters(call)
@@ -305,7 +326,7 @@ class HealthFitnessPlugin : Plugin() {
         if (!implementation.requestingExactAlarmPermission) return
         implementation.requestingExactAlarmPermission = false
 
-        val call = savedCall ?: return
+        val call = takeSavedCall() ?: return
         if (SDK_INT >= 31 && !implementation.canScheduleExactAlarms()) {
             sendError(call, HealthFitnessError.BACKGROUND_JOB_EXACT_ALARM_PERMISSION_DENIED_ERROR)
             return
@@ -315,7 +336,7 @@ class HealthFitnessPlugin : Plugin() {
 
     override fun handleOnActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.handleOnActivityResult(requestCode, resultCode, data)
-        val call = savedCall ?: return
+        val call = takeSavedCall() ?: return
 
         data?.let {
             if (it.getBooleanExtra(com.outsystems.plugins.healthfitness.data.Constants.EXTRA_CONTAINS_READ_DATA_BACKGROUND, false)) {
