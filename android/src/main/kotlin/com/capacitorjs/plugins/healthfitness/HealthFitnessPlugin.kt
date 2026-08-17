@@ -394,7 +394,7 @@ class HealthFitnessPlugin : Plugin() {
 
     private fun sendSuccessWithWarning(call: PluginCall, result: Any?, warning: OSHealthFitnessWarning) {
         val warningObject = JSObject().apply {
-            put("code", warning.code)
+            put("code", formatErrorCode(warning.code))
             put("message", warning.message)
         }
         call.resolve(JSObject().apply {
