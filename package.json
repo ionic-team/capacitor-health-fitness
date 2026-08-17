@@ -1,6 +1,6 @@
 {
   "name": "@capacitor/health-fitness",
-  "version": "0.0.1-dev-20260811.0",
+  "version": "0.0.1-dev-20260817.0",
   "description": "Access Android Health Connect and Apple HealthKit data for health and fitness apps.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
