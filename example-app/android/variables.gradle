@@ -1,5 +1,6 @@
 ext {
-    minSdkVersion = 24
+    // health-fitness requires minSdk 26 (io.ionic.libs:ionhealthfitness-android) - see plugin README.
+    minSdkVersion = 26
     compileSdkVersion = 36
     targetSdkVersion = 36
     androidxActivityVersion = '1.11.0'

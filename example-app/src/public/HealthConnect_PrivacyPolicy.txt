@@ -1,0 +1,6 @@
+Health Connect Privacy Policy (sample)
+
+This is a placeholder privacy policy file used for local testing of the
+capacitor-health-fitness example app. It documents what health and fitness
+data the app reads and writes via Android Health Connect, and confirms that
+data is not shared with third parties.

@@ -1,2 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+      Health Connect READ_/WRITE_ permissions for individual variables, the
+      background-job permission set, and the read-history permission are all
+      added dynamically by the capacitor:sync:after hook instead of declared
+      here - the background-job and read-history groups are each optional
+      (disableBackgroundJobs / disableReadHealthDataHistory), matching the
+      Cordova plugin's DisableBackgroundJobs / DisableReadHealthDataHistory
+      preferences, and Android manifest merging has no equivalent conditional
+      mechanism for a plugin's own static declarations. See android/NOTES.md.
+    -->
 </manifest>
