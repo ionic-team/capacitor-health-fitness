@@ -3,7 +3,6 @@ import { WebPlugin } from '@capacitor/core';
 import type {
   AdvancedQueryOptions,
   AdvancedQueryResult,
-  BackgroundJobResult,
   DeleteBackgroundJobOptions,
   GetLastRecordOptions,
   HealthFitnessPlugin,
@@ -39,7 +38,7 @@ export class HealthFitnessWeb extends WebPlugin implements HealthFitnessPlugin {
     throw this.unimplemented('Not implemented on web.');
   }
 
-  async setBackgroundJob(_options: SetBackgroundJobOptions): Promise<BackgroundJobResult> {
+  async setBackgroundJob(_options: SetBackgroundJobOptions): Promise<void> {
     throw this.unimplemented('Not implemented on web.');
   }
 

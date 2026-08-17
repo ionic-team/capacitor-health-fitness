@@ -75,10 +75,6 @@ export interface SetBackgroundJobOptions {
   parameters: string;
 }
 
-export interface BackgroundJobResult {
-  id: string;
-}
-
 export interface DeleteBackgroundJobOptions {
   id: string;
 }
@@ -149,7 +145,7 @@ export interface HealthFitnessPlugin {
    *
    * @since 1.0.0
    */
-  setBackgroundJob(options: SetBackgroundJobOptions): Promise<BackgroundJobResult>;
+  setBackgroundJob(options: SetBackgroundJobOptions): Promise<void>;
 
   /**
    * Deletes a background job by id.

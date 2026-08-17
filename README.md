@@ -157,7 +157,7 @@ Retrieves the last recorded value for a variable.
 ### setBackgroundJob(...)
 
 ```typescript
-setBackgroundJob(options: SetBackgroundJobOptions) => Promise<BackgroundJobResult>
+setBackgroundJob(options: SetBackgroundJobOptions) => Promise<void>
 ```
 
 Creates a background job that monitors a variable and notifies on a condition.
@@ -165,8 +165,6 @@ Creates a background job that monitors a variable and notifies on a condition.
 | Param         | Type                                                                        |
 | ------------- | --------------------------------------------------------------------------- |
 | **`options`** | <code><a href="#setbackgroundjoboptions">SetBackgroundJobOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#backgroundjobresult">BackgroundJobResult</a>&gt;</code>
 
 **Since:** 1.0.0
 
@@ -306,13 +304,6 @@ Android only (see the class-level note on the current iOS/Android parity gap).
 | Prop           | Type                |
 | -------------- | ------------------- |
 | **`variable`** | <code>string</code> |
-
-
-#### BackgroundJobResult
-
-| Prop     | Type                |
-| -------- | ------------------- |
-| **`id`** | <code>string</code> |
 
 
 #### SetBackgroundJobOptions
