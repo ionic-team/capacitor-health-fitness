@@ -1,3 +1,10 @@
+# 1.0.0 (2026-08-17)
+
+
+### Features
+
+* new health and fitness Capacitor plugin ([#1](https://github.com/ionic-team/capacitor-health-fitness/issues/1)) ([b3b74ee](https://github.com/ionic-team/capacitor-health-fitness/commit/b3b74eeb43ba4fb5f989ff246e38f6cb1548a938))
+
 # Changelog
 All notable changes to this project will be documented in this file.
 
