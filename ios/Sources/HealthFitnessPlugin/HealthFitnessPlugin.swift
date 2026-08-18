@@ -41,16 +41,13 @@ public class HealthFitnessPlugin: CAPPlugin, CAPBridgedPlugin {
         let fitnessVariables = call.getString("fitnessVariables") ?? ""
         let healthVariables = call.getString("healthVariables") ?? ""
         let profileVariables = call.getString("profileVariables") ?? ""
-        // NOTE: workoutVariables is intentionally not read here either - the
-        // Cordova plugin reads it via an out-of-bounds positional index on
-        // iOS today (command.argument(at: 6) on a 6-element args array), so
-        // it always resolves empty there too.
+        let workoutVariables = call.getString("workoutVariables") ?? ""
         let variable = VariableStruct(
             allVariables: allVariables,
             fitnessVariables: fitnessVariables,
             healthVariables: healthVariables,
             profileVariables: profileVariables,
-            workoutVariables: ""
+            workoutVariables: workoutVariables
         )
 
         implementation.plugin.requestPermissions(customPermissions: customPermissions, variable: variable) { authorized, error in

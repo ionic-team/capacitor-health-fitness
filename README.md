@@ -177,19 +177,23 @@ fields.
 ### Requesting permissions
 
 Call this before any other method. `allVariables`/`fitnessVariables`/
-`healthVariables`/`profileVariables` each take a JSON-encoded
-`{ IsActive, AccessType }` descriptor (`AccessType` is `READ`, `WRITE`, or
-`READWRITE`) targeting a themed subset of variables:
+`healthVariables`/`profileVariables`/`workoutVariables` each take a
+JSON-encoded `{ IsActive, AccessType }` descriptor (`AccessType` is `READ`,
+`WRITE`, or `READWRITE`) targeting a themed subset of variables:
 
 - **Fitness:** `STEPS`, `CALORIES_BURNED`, `DISTANCE`, `WALKING_SPEED`
 - **Health:** `HEART_RATE`, `SLEEP`, `BLOOD_PRESSURE`, `BLOOD_GLUCOSE`,
   `OXYGEN_SATURATION`, `BODY_TEMPERATURE`
 - **Profile:** `WEIGHT`, `HEIGHT`, `BODY_FAT_PERCENTAGE`,
   `BASAL_METABOLIC_RATE`
+- **Workout** (iOS only): HealthKit's workout type, needed for
+  `getWorkoutData()`
 
 Setting `allVariables`'s `IsActive` to `true` requests every variable at
-once. Use `customPermissions` to request individual variables directly
-instead, e.g. `[{"Variable":"STEPS","AccessType":"READ"}]`.
+once (this already includes workout on iOS). Use `workoutVariables` on its
+own to request just workout access without everything else, or
+`customPermissions` to request individual variables directly, e.g.
+`[{"Variable":"STEPS","AccessType":"READ"}]`.
 
 ```typescript
 import { HealthFitness } from '@capacitor/health-fitness';
@@ -200,7 +204,7 @@ await HealthFitness.requestHealthPermissions({
   fitnessVariables: JSON.stringify({ IsActive: false, AccessType: 'READWRITE' }),
   healthVariables: JSON.stringify({ IsActive: false, AccessType: 'READWRITE' }),
   profileVariables: JSON.stringify({ IsActive: false, AccessType: 'READWRITE' }),
-  workoutVariables: '{}',
+  workoutVariables: JSON.stringify({ IsActive: false, AccessType: 'READWRITE' }), // allVariables already covers this
 });
 ```
 
@@ -558,14 +562,14 @@ Android only - HealthKit has no equivalent standalone app to open.
 
 #### RequestHealthPermissionsOptions
 
-| Prop                    | Type                | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ----------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`customPermissions`** | <code>string</code> | JSON-encoded string: an array of individual variable permission descriptors, e.g. `[{"Variable":"STEPS","AccessType":"READ"}]`. Use this to request permission for specific variables not covered by (or instead of) the broader groups below. `AccessType` is `READ`, `WRITE`, or `READWRITE`.                                                                                                                                                                                    |
-| **`allVariables`**      | <code>string</code> | JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" \| "WRITE" \| "READWRITE"}`. When `IsActive` is `true`, requests the given access to every health/fitness variable the plugin supports.                                                                                                                                                                                                                                                                           |
-| **`fitnessVariables`**  | <code>string</code> | JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" \| "WRITE" \| "READWRITE"}`. Covers the "fitness" variable group: `STEPS`, `CALORIES_BURNED`, `DISTANCE`, `WALKING_SPEED`.                                                                                                                                                                                                                                                                                        |
-| **`healthVariables`**   | <code>string</code> | JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" \| "WRITE" \| "READWRITE"}`. Covers the "health" variable group: `HEART_RATE`, `SLEEP`, `BLOOD_PRESSURE`, `BLOOD_GLUCOSE`, `OXYGEN_SATURATION`, `BODY_TEMPERATURE` (iOS also includes dietary water and dietary energy consumed, which have no Android equivalent).                                                                                                                                               |
-| **`profileVariables`**  | <code>string</code> | JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" \| "WRITE" \| "READWRITE"}`. Covers the "profile" variable group: `WEIGHT`, `HEIGHT`, `BODY_FAT_PERCENTAGE`, `BASAL_METABOLIC_RATE`.                                                                                                                                                                                                                                                                              |
-| **`workoutVariables`**  | <code>string</code> | JSON-encoded string (group permission descriptor). NOTE: not actually used on either platform in the current implementation - Android never parses this argument, and the Capacitor iOS bridge hardcodes it to an empty string before it reaches the native library. There is currently no way to request workout permission (needed for `getWorkoutData()`, iOS only) on its own; use `allVariables` instead - HealthKit's workout type is included in the "all variables" group. |
+| Prop                    | Type                | Description                                                                                                                                                                                                                                                                                                                          |
+| ----------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`customPermissions`** | <code>string</code> | JSON-encoded string: an array of individual variable permission descriptors, e.g. `[{"Variable":"STEPS","AccessType":"READ"}]`. Use this to request permission for specific variables not covered by (or instead of) the broader groups below. `AccessType` is `READ`, `WRITE`, or `READWRITE`.                                      |
+| **`allVariables`**      | <code>string</code> | JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" \| "WRITE" \| "READWRITE"}`. When `IsActive` is `true`, requests the given access to every health/fitness variable the plugin supports.                                                                                                                             |
+| **`fitnessVariables`**  | <code>string</code> | JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" \| "WRITE" \| "READWRITE"}`. Covers the "fitness" variable group: `STEPS`, `CALORIES_BURNED`, `DISTANCE`, `WALKING_SPEED`.                                                                                                                                          |
+| **`healthVariables`**   | <code>string</code> | JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" \| "WRITE" \| "READWRITE"}`. Covers the "health" variable group: `HEART_RATE`, `SLEEP`, `BLOOD_PRESSURE`, `BLOOD_GLUCOSE`, `OXYGEN_SATURATION`, `BODY_TEMPERATURE` (iOS also includes dietary water and dietary energy consumed, which have no Android equivalent). |
+| **`profileVariables`**  | <code>string</code> | JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" \| "WRITE" \| "READWRITE"}`. Covers the "profile" variable group: `WEIGHT`, `HEIGHT`, `BODY_FAT_PERCENTAGE`, `BASAL_METABOLIC_RATE`.                                                                                                                                |
+| **`workoutVariables`**  | <code>string</code> | JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" \| "WRITE" \| "READWRITE"}`. Requests permission for HealthKit's workout type, needed for `getWorkoutData()`. iOS only - not supported on Android (`getWorkoutData()` is iOS only; this field is never read there).                                                 |
 
 
 #### AdvancedQueryResult

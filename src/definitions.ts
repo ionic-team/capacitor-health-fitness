@@ -34,14 +34,12 @@ export interface RequestHealthPermissionsOptions {
    */
   profileVariables: string;
   /**
-   * JSON-encoded string (group permission descriptor).
+   * JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" | "WRITE" | "READWRITE"}`.
+   * Requests permission for HealthKit's workout type, needed for
+   * `getWorkoutData()`.
    *
-   * NOTE: not actually used on either platform in the current implementation
-   * - Android never parses this argument, and the Capacitor iOS bridge
-   * hardcodes it to an empty string before it reaches the native library.
-   * There is currently no way to request workout permission (needed for
-   * `getWorkoutData()`, iOS only) on its own; use `allVariables` instead -
-   * HealthKit's workout type is included in the "all variables" group.
+   * iOS only - not supported on Android (`getWorkoutData()` is iOS only;
+   * this field is never read there).
    */
   workoutVariables: string;
 }
