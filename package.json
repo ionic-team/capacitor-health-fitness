@@ -9,12 +9,10 @@
   "files": [
     "android/src/main/",
     "android/build.gradle",
-    "android/NOTES.md",
     "dist/",
     "hooks/",
     "ios/Sources",
     "ios/Tests",
-    "ios/NOTES.md",
     "Package.swift",
     "CapacitorHealthFitness.podspec",
     "CHANGELOG.md"

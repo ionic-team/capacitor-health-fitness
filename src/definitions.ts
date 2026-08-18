@@ -1,23 +1,47 @@
 export interface RequestHealthPermissionsOptions {
   /**
-   * JSON-encoded string (array of custom permission descriptors), matching the
-   * existing Cordova plugin's wire format exactly.
+   * JSON-encoded string: an array of individual variable permission
+   * descriptors, e.g. `[{"Variable":"STEPS","AccessType":"READ"}]`. Use this
+   * to request permission for specific variables not covered by (or instead
+   * of) the broader groups below. `AccessType` is `READ`, `WRITE`, or
+   * `READWRITE`.
    */
   customPermissions: string;
-  /** JSON-encoded string (group permission descriptor). */
+  /**
+   * JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" | "WRITE" | "READWRITE"}`.
+   * When `IsActive` is `true`, requests the given access to every
+   * health/fitness variable the plugin supports.
+   */
   allVariables: string;
-  /** JSON-encoded string (group permission descriptor). */
+  /**
+   * JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" | "WRITE" | "READWRITE"}`.
+   * Covers the "fitness" variable group: `STEPS`, `CALORIES_BURNED`,
+   * `DISTANCE`, `WALKING_SPEED`.
+   */
   fitnessVariables: string;
-  /** JSON-encoded string (group permission descriptor). */
+  /**
+   * JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" | "WRITE" | "READWRITE"}`.
+   * Covers the "health" variable group: `HEART_RATE`, `SLEEP`,
+   * `BLOOD_PRESSURE`, `BLOOD_GLUCOSE`, `OXYGEN_SATURATION`,
+   * `BODY_TEMPERATURE` (iOS also includes dietary water and dietary energy
+   * consumed, which have no Android equivalent).
+   */
   healthVariables: string;
-  /** JSON-encoded string (group permission descriptor). */
+  /**
+   * JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" | "WRITE" | "READWRITE"}`.
+   * Covers the "profile" variable group: `WEIGHT`, `HEIGHT`,
+   * `BODY_FAT_PERCENTAGE`, `BASAL_METABOLIC_RATE`.
+   */
   profileVariables: string;
   /**
    * JSON-encoded string (group permission descriptor).
    *
-   * NOTE: not actually read on either platform in the current implementation
-   * (Android never parses this argument; iOS reads an out-of-bounds index).
-   * Preserved as-is for wire-format parity with the Cordova plugin.
+   * NOTE: not actually used on either platform in the current implementation
+   * - Android never parses this argument, and the Capacitor iOS bridge
+   * hardcodes it to an empty string before it reaches the native library.
+   * There is currently no way to request workout permission (needed for
+   * `getWorkoutData()`, iOS only) on its own; use `allVariables` instead -
+   * HealthKit's workout type is included in the "all variables" group.
    */
   workoutVariables: string;
 }
@@ -26,9 +50,8 @@ export interface AdvancedQueryOptions {
   /**
    * JSON-encoded string containing the full query parameters object
    * (variable, startDate, endDate, timeUnit, operationType, timeUnitLength,
-   * advancedQueryReturnType, advancedQueryResultType). Matches the existing
-   * Cordova plugin's wire format exactly - a single serialized blob, not
-   * individual fields.
+   * advancedQueryReturnType, advancedQueryResultType) - a single serialized
+   * blob, not individual fields.
    */
   parameters: string;
 }
@@ -38,15 +61,19 @@ export interface AdvancedQueryResult {
   results?: string;
   /** JSON-encoded string containing chart-ready accelerator data points. */
   resultDataPoints?: string;
-  /** Present only when the query hit a deprecated-parameter path (e.g. TimeUnit). */
-  warning?: { code: number; message: string };
+  /**
+   * Present only on Android, and only when `getData()`'s `TimeUnit` parameter
+   * is `MILLISECONDS` or `SECONDS` - both are deprecated on Health Connect,
+   * so the query silently runs with `TimeUnit: 'MINUTE'` instead. `code` is
+   * `OS-PLUG-HLFT-0405`.
+   */
+  warning?: { code: string; message: string };
 }
 
 export interface WorkoutAdvancedQueryOptions {
   /**
    * JSON-encoded string containing the full workout query parameters object
-   * (workoutTypeVariables, startDate, endDate). Matches the existing Cordova
-   * plugin's wire format exactly - a single serialized blob.
+   * (workoutTypeVariables, startDate, endDate) - a single serialized blob.
    */
   parameters: string;
 }
@@ -69,8 +96,7 @@ export interface SetBackgroundJobOptions {
    * JSON-encoded string containing the full background job parameters object
    * (variable, timeUnit, timeUnitGrouping, notificationFrequency,
    * notificationFrequencyGrouping, jobFrequency, condition, value,
-   * notificationHeader, notificationBody). Matches the existing Cordova
-   * plugin's wire format exactly - a single serialized blob.
+   * notificationHeader, notificationBody) - a single serialized blob.
    */
   parameters: string;
 }
@@ -88,8 +114,8 @@ export interface UpdateBackgroundJobOptions {
   /**
    * JSON-encoded string containing the full update parameters object (id,
    * notificationFrequency, notificationFrequencyGrouping, condition, value,
-   * notificationHeader, notificationBody, isActive). Matches the existing
-   * Cordova plugin's wire format exactly - a single serialized blob.
+   * notificationHeader, notificationBody, isActive) - a single serialized
+   * blob.
    */
   parameters: string;
 }
@@ -97,12 +123,6 @@ export interface UpdateBackgroundJobOptions {
 export interface HealthFitnessPlugin {
   /**
    * Requests the given HealthKit / Health Connect permissions.
-   *
-   * Named distinctly from Capacitor's own `requestPermissions()` convention
-   * (which expects a `Promise<PermissionStatus>` from a declarative
-   * `@CapacitorPlugin(permissions = [...])` alias list) - this method takes
-   * pre-serialized JSON descriptors and resolves void, matching the existing
-   * Cordova wire format instead.
    *
    * @since 1.0.0
    */
@@ -119,8 +139,8 @@ export interface HealthFitnessPlugin {
    * Performs an advanced query for workout data over a date range.
    *
    * iOS only - the underlying native Android library has no workout-specific
-   * query. Always rejects with `HealthFitnessError.OPERATION_NOT_ALLOWED`
-   * (code 102) on Android.
+   * query. Not implemented on Android, so calling it there rejects with
+   * Capacitor's standard `UNIMPLEMENTED` error.
    *
    * @since 1.0.0
    */
@@ -169,14 +189,19 @@ export interface HealthFitnessPlugin {
   updateBackgroundJob(options: UpdateBackgroundJobOptions): Promise<void>;
 
   /**
-   * Android only (see the class-level note on the current iOS/Android parity gap).
+   * Revokes all Health Connect permissions previously granted to the app.
+   *
+   * Android only - HealthKit has no equivalent API for an app to revoke its
+   * own access.
    *
    * @since 1.0.0
    */
   disconnectFromHealthConnect(): Promise<void>;
 
   /**
-   * Android only (see the class-level note on the current iOS/Android parity gap).
+   * Opens the Health Connect app. Rejects if Health Connect is not installed.
+   *
+   * Android only - HealthKit has no equivalent standalone app to open.
    *
    * @since 1.0.0
    */

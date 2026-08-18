@@ -1,6 +1,6 @@
 # @capacitor/health-fitness
 
-Access Android Health Connect and Apple HealthKit data for health and fitness apps.
+Access Android Health Connect and Apple HealthKit data for health and fitness apps. Not available on web.
 
 ## Install
 
@@ -22,14 +22,318 @@ Sync native files
 npx cap sync
 ```
 
-## Setup
+## iOS
 
-- **Android:** required Health Connect permissions and the privacy-policy URL
-  are configured via a `capacitor:sync:after` hook - see
-  [`android/NOTES.md`](android/NOTES.md).
-- **iOS:** the host app must declare `NSHealthShareUsageDescription` /
-  `NSHealthUpdateUsageDescription` and enable the HealthKit capability - see
-  [`ios/NOTES.md`](ios/NOTES.md).
+The consuming app's `Info.plist` must declare the following (the plugin cannot
+set these on the host app itself):
+
+```xml
+<key>NSHealthShareUsageDescription</key>
+<string>App needs to share health data</string>
+<key>NSHealthUpdateUsageDescription</key>
+<string>App needs to use health data</string>
+<key>UIBackgroundModes</key>
+<array>
+  <string>fetch</string>
+  <string>processing</string>
+</array>
+<key>BGTaskSchedulerPermittedIdentifiers</key>
+<array>
+  <string>com.outsystems.health.default</string>
+</array>
+```
+
+The app target also needs the **HealthKit** capability enabled, with the
+following entitlements set to `true` (both Debug and Release):
+
+- `com.apple.developer.healthkit`
+- `com.apple.developer.healthkit.background-delivery`
+- `com.apple.developer.healthkit.recalibrate-estimates`
+
+and an empty array for `com.apple.developer.healthkit.access`.
+
+## Android
+
+This plugin ships a `capacitor:sync:after` hook (`hooks/capacitorCopyHealthFitnessConfigs.js`)
+that runs on every `npx cap sync`/`npx cap update` and edits the consuming
+app's generated `android/app/src/main/AndroidManifest.xml` to declare the
+Health Connect permissions the app actually needs. Health Connect permissions
+cannot be requested at runtime the way Capacitor's `plugins.<Name>` config
+values are read - they must exist in the manifest at build time - hence the
+sync-time hook instead of `getConfig()`.
+
+### Declaring permissions
+
+Create `android/healthfitness.config.json` in the consuming app (next to
+`android/app/`):
+
+```json
+{
+  "permissions": {
+    "HEART_RATE": "Read",
+    "STEPS": "ReadWrite",
+    "WEIGHT": "Write",
+    "HEIGHT": "Read",
+    "CALORIES_BURNED": "Read",
+    "SLEEP": "Read",
+    "BLOOD_PRESSURE": "Read",
+    "BLOOD_GLUCOSE": "Read",
+    "BODY_FAT_PERCENTAGE": "Read",
+    "BASAL_METABOLIC_RATE": "Read",
+    "WALKING_SPEED": "Read",
+    "DISTANCE": "Read",
+    "OXYGEN_SATURATION": "Read",
+    "BODY_TEMPERATURE": "Read"
+  },
+  "groupPermissions": {
+    "ALL_VARIABLES": "ReadWrite",
+    "FITNESS_VARIABLES": "Read",
+    "HEALTH_VARIABLES": "Read",
+    "PROFILE_VARIABLES": "Read"
+  }
+}
+```
+
+Each value is one of `Read`, `Write`, or `ReadWrite`. Both files are optional
+per key - only declare what the app actually uses. If neither
+`healthfitness.config.json` nor any key in it is present, the hook falls back
+to declaring **every** Health Connect permission (matching the plugin's
+previous, non-configurable behavior) so a consuming app that skips
+configuration still works, at the cost of declaring more permissions than it
+needs.
+
+### Background jobs and read-history permissions
+
+Two more permission groups are on by default and can be opted out of via
+top-level flags in `android/healthfitness.config.json`:
+
+```json
+{
+  "disableBackgroundJobs": false,
+  "disableReadHealthDataHistory": false
+}
+```
+
+- `disableBackgroundJobs: true` skips `READ_HEALTH_DATA_IN_BACKGROUND`,
+  `POST_NOTIFICATIONS`, `ACTIVITY_RECOGNITION` (both the platform and Google
+  Play Services variants), `FOREGROUND_SERVICE`,
+  `FOREGROUND_SERVICE_HEALTH`, `HIGH_SAMPLING_RATE_SENSORS`, and
+  `SCHEDULE_EXACT_ALARM` - i.e. everything `setBackgroundJob` needs.
+- `disableReadHealthDataHistory: true` skips `READ_HEALTH_DATA_HISTORY` (lets
+  the app read data older than 30 days before the first Health Connect grant).
+
+### Background notification content
+
+`setBackgroundJob`'s foreground notification title/description are read from
+the consuming app's `res/values/strings.xml` (`background_notification_title`
+/ `background_notification_description`) - and read unconditionally at plugin
+load time (app startup), not just when a background job is actually set, so
+a missing value crashes the app immediately rather than only when the feature
+is used. The hook creates both with sensible defaults if missing, overridable
+via `android/healthfitness.config.json`:
+
+```json
+{
+  "backgroundNotificationTitle": "Health & Fitness",
+  "backgroundNotificationDescription": "Monitoring your health and fitness data in the background."
+}
+```
+
+### Privacy policy URL
+
+Health Connect requires a privacy policy URL for apps requesting these
+permissions - `requestHealthPermissions()` rejects without one, and Health
+Connect opens the URL directly in a browser from its own permissions screen,
+so it must be a real, publicly-reachable `https://` link, not a bundled local
+file. The simplest way to set it is directly in
+`android/healthfitness.config.json`:
+
+```json
+{
+  "privacyPolicyUrl": "https://example.com/privacy-policy"
+}
+```
+
+If `privacyPolicyUrl` isn't set, the hook falls back to deriving one from
+`capacitor.config.json`'s `server.url` + a fixed `HealthConnect_PrivacyPolicy.txt`
+filename - only useful for apps that already serve their web content from a
+remote server and host that file there (`www/HealthConnect_PrivacyPolicy.txt`,
+copied to `android/app/src/main/assets/public/` by `cap sync`). Most Capacitor
+apps bundle their web assets locally and have no `server.url`, so this
+fallback will never resolve for them - use `privacyPolicyUrl` directly
+instead.
+
+Either way, if `strings.xml` already has a non-empty `privacy_policy_url`
+(e.g. set by a separate build step), the hook leaves it untouched.
+
+## Examples
+
+Every method below is exercised by the plugin's own
+[`example-app`](https://github.com/ionic-team/capacitor-health-fitness/tree/main/example-app) -
+the snippets here are taken directly from it. Note that every options object
+is a plain object whose values are themselves JSON-encoded strings, not typed
+fields.
+
+### Requesting permissions
+
+Call this before any other method. `allVariables`/`fitnessVariables`/
+`healthVariables`/`profileVariables` each take a JSON-encoded
+`{ IsActive, AccessType }` descriptor (`AccessType` is `READ`, `WRITE`, or
+`READWRITE`) targeting a themed subset of variables:
+
+- **Fitness:** `STEPS`, `CALORIES_BURNED`, `DISTANCE`, `WALKING_SPEED`
+- **Health:** `HEART_RATE`, `SLEEP`, `BLOOD_PRESSURE`, `BLOOD_GLUCOSE`,
+  `OXYGEN_SATURATION`, `BODY_TEMPERATURE`
+- **Profile:** `WEIGHT`, `HEIGHT`, `BODY_FAT_PERCENTAGE`,
+  `BASAL_METABOLIC_RATE`
+
+Setting `allVariables`'s `IsActive` to `true` requests every variable at
+once. Use `customPermissions` to request individual variables directly
+instead, e.g. `[{"Variable":"STEPS","AccessType":"READ"}]`.
+
+```typescript
+import { HealthFitness } from '@capacitor/health-fitness';
+
+await HealthFitness.requestHealthPermissions({
+  customPermissions: '[]',
+  allVariables: JSON.stringify({ IsActive: true, AccessType: 'READWRITE' }),
+  fitnessVariables: JSON.stringify({ IsActive: false, AccessType: 'READWRITE' }),
+  healthVariables: JSON.stringify({ IsActive: false, AccessType: 'READWRITE' }),
+  profileVariables: JSON.stringify({ IsActive: false, AccessType: 'READWRITE' }),
+  workoutVariables: '{}',
+});
+```
+
+### Querying data
+
+`getData()` runs an "advanced query": it reads one variable (e.g. `STEPS`)
+over a date range, bucketed into a time unit (e.g. one bucket per day), and
+aggregated within each bucket by an operation (e.g. `SUM`). This example
+reads the last 7 days of daily step totals:
+
+```typescript
+import { HealthFitness } from '@capacitor/health-fitness';
+
+// No milliseconds in the date strings - the native date parser only accepts
+// "yyyy-MM-dd'T'HH:mm:ssZ", so toISOString()'s fractional-seconds suffix
+// must be trimmed off.
+const isoDate = (d: Date) => d.toISOString().split('.')[0] + 'Z';
+const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+const { results } = await HealthFitness.getData({
+  parameters: JSON.stringify({
+    Variable: 'STEPS',
+    StartDate: isoDate(sevenDaysAgo),
+    EndDate: isoDate(tomorrow),
+    TimeUnit: 'DAY',
+    OperationType: 'SUM',
+    TimeUnitLength: 1,
+    AdvancedQueryReturnType: 'ALL_DATA',
+    AdvancedQueryResultType: 'RAW_DATA',
+  }),
+});
+
+// results is itself a JSON-encoded string
+console.log(JSON.parse(results ?? '[]'));
+```
+
+### Writing data
+
+```typescript
+import { HealthFitness } from '@capacitor/health-fitness';
+
+await HealthFitness.writeData({ variable: 'WEIGHT', value: 75 });
+```
+
+### Getting the last recorded value
+
+```typescript
+import { HealthFitness } from '@capacitor/health-fitness';
+
+const { results } = await HealthFitness.getLastRecord({ variable: 'STEPS' });
+```
+
+### Querying workout data (iOS only)
+
+```typescript
+import { HealthFitness } from '@capacitor/health-fitness';
+
+const isoDate = (d: Date) => d.toISOString().split('.')[0] + 'Z';
+
+const { results } = await HealthFitness.getWorkoutData({
+  parameters: JSON.stringify({
+    WorkoutTypeVariables: [],
+    StartDate: isoDate(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)),
+    EndDate: isoDate(new Date(Date.now() + 24 * 60 * 60 * 1000)),
+  }),
+});
+```
+
+### Background jobs
+
+A background job watches a single variable and fires a local notification
+when a condition is met - for example, notify the user once their daily
+step count goes above 100. `JobFrequency`/`TimeUnit` control how often the
+condition is checked; `NotificationFrequency` controls how often the
+notification itself is allowed to re-fire once the condition is met.
+
+```typescript
+import { HealthFitness } from '@capacitor/health-fitness';
+
+await HealthFitness.setBackgroundJob({
+  parameters: JSON.stringify({
+    Variable: 'STEPS',
+    TimeUnit: 'DAY',
+    TimeUnitGrouping: 1,
+    NotificationFrequency: 'DAY',
+    NotificationFrequencyGrouping: 1,
+    JobFrequency: 'DAY',
+    Condition: 'HIGHER',
+    Value: 100,
+    NotificationHeader: 'Goal reached!',
+    NotificationBody: "You've taken over 100 steps today.",
+  }),
+});
+```
+
+List all existing background jobs:
+
+```typescript
+const { jobs } = await HealthFitness.listBackgroundJobs();
+const parsedJobs = JSON.parse(jobs);
+console.log(parsedJobs);
+```
+
+Update or delete a job using its `id`:
+
+```typescript
+const jobId = parsedJobs[0].id;
+
+await HealthFitness.updateBackgroundJob({
+  parameters: JSON.stringify({
+    Id: jobId,
+    NotificationFrequency: 'DAY',
+    NotificationFrequencyGrouping: 1,
+    Condition: 'HIGHER',
+    Value: 100,
+    NotificationHeader: 'Goal reached!',
+    NotificationBody: "You've taken over 100 steps today.",
+    IsActive: 'true',
+  }),
+});
+
+await HealthFitness.deleteBackgroundJob({ id: jobId });
+```
+
+### Disconnecting / opening Health Connect (Android only)
+
+```typescript
+import { HealthFitness } from '@capacitor/health-fitness';
+
+await HealthFitness.disconnectFromHealthConnect();
+await HealthFitness.openHealthConnect();
+```
 
 ## API
 
@@ -60,12 +364,6 @@ requestHealthPermissions(options: RequestHealthPermissionsOptions) => Promise<vo
 ```
 
 Requests the given HealthKit / Health Connect permissions.
-
-Named distinctly from Capacitor's own `requestPermissions()` convention
-(which expects a `Promise&lt;PermissionStatus&gt;` from a declarative
-`@CapacitorPlugin(permissions = [...])` alias list) - this method takes
-pre-serialized JSON descriptors and resolves void, matching the existing
-Cordova wire format instead.
 
 | Param         | Type                                                                                        |
 | ------------- | ------------------------------------------------------------------------------------------- |
@@ -104,8 +402,8 @@ getWorkoutData(options: WorkoutAdvancedQueryOptions) => Promise<WorkoutAdvancedQ
 Performs an advanced query for workout data over a date range.
 
 iOS only - the underlying native Android library has no workout-specific
-query. Always rejects with `HealthFitnessError.OPERATION_NOT_ALLOWED`
-(code 102) on Android.
+query. Not implemented on Android, so calling it there rejects with
+Capacitor's standard `UNIMPLEMENTED` error.
 
 | Param         | Type                                                                                |
 | ------------- | ----------------------------------------------------------------------------------- |
@@ -226,7 +524,10 @@ Updates an existing background job's parameters.
 disconnectFromHealthConnect() => Promise<void>
 ```
 
-Android only (see the class-level note on the current iOS/Android parity gap).
+Revokes all Health Connect permissions previously granted to the app.
+
+Android only - HealthKit has no equivalent API for an app to revoke its
+own access.
 
 **Since:** 1.0.0
 
@@ -239,7 +540,9 @@ Android only (see the class-level note on the current iOS/Android parity gap).
 openHealthConnect() => Promise<void>
 ```
 
-Android only (see the class-level note on the current iOS/Android parity gap).
+Opens the Health Connect app. Rejects if Health Connect is not installed.
+
+Android only - HealthKit has no equivalent standalone app to open.
 
 **Since:** 1.0.0
 
@@ -251,30 +554,30 @@ Android only (see the class-level note on the current iOS/Android parity gap).
 
 #### RequestHealthPermissionsOptions
 
-| Prop                    | Type                | Description                                                                                                                                                                                                                                                         |
-| ----------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`customPermissions`** | <code>string</code> | JSON-encoded string (array of custom permission descriptors), matching the existing Cordova plugin's wire format exactly.                                                                                                                                           |
-| **`allVariables`**      | <code>string</code> | JSON-encoded string (group permission descriptor).                                                                                                                                                                                                                  |
-| **`fitnessVariables`**  | <code>string</code> | JSON-encoded string (group permission descriptor).                                                                                                                                                                                                                  |
-| **`healthVariables`**   | <code>string</code> | JSON-encoded string (group permission descriptor).                                                                                                                                                                                                                  |
-| **`profileVariables`**  | <code>string</code> | JSON-encoded string (group permission descriptor).                                                                                                                                                                                                                  |
-| **`workoutVariables`**  | <code>string</code> | JSON-encoded string (group permission descriptor). NOTE: not actually read on either platform in the current implementation (Android never parses this argument; iOS reads an out-of-bounds index). Preserved as-is for wire-format parity with the Cordova plugin. |
+| Prop                    | Type                | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`customPermissions`** | <code>string</code> | JSON-encoded string: an array of individual variable permission descriptors, e.g. `[{"Variable":"STEPS","AccessType":"READ"}]`. Use this to request permission for specific variables not covered by (or instead of) the broader groups below. `AccessType` is `READ`, `WRITE`, or `READWRITE`.                                                                                                                                                                                    |
+| **`allVariables`**      | <code>string</code> | JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" \| "WRITE" \| "READWRITE"}`. When `IsActive` is `true`, requests the given access to every health/fitness variable the plugin supports.                                                                                                                                                                                                                                                                           |
+| **`fitnessVariables`**  | <code>string</code> | JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" \| "WRITE" \| "READWRITE"}`. Covers the "fitness" variable group: `STEPS`, `CALORIES_BURNED`, `DISTANCE`, `WALKING_SPEED`.                                                                                                                                                                                                                                                                                        |
+| **`healthVariables`**   | <code>string</code> | JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" \| "WRITE" \| "READWRITE"}`. Covers the "health" variable group: `HEART_RATE`, `SLEEP`, `BLOOD_PRESSURE`, `BLOOD_GLUCOSE`, `OXYGEN_SATURATION`, `BODY_TEMPERATURE` (iOS also includes dietary water and dietary energy consumed, which have no Android equivalent).                                                                                                                                               |
+| **`profileVariables`**  | <code>string</code> | JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" \| "WRITE" \| "READWRITE"}`. Covers the "profile" variable group: `WEIGHT`, `HEIGHT`, `BODY_FAT_PERCENTAGE`, `BASAL_METABOLIC_RATE`.                                                                                                                                                                                                                                                                              |
+| **`workoutVariables`**  | <code>string</code> | JSON-encoded string (group permission descriptor). NOTE: not actually used on either platform in the current implementation - Android never parses this argument, and the Capacitor iOS bridge hardcodes it to an empty string before it reaches the native library. There is currently no way to request workout permission (needed for `getWorkoutData()`, iOS only) on its own; use `allVariables` instead - HealthKit's workout type is included in the "all variables" group. |
 
 
 #### AdvancedQueryResult
 
-| Prop                   | Type                                            | Description                                                                  |
-| ---------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------- |
-| **`results`**          | <code>string</code>                             | JSON-encoded string containing the raw result blocks.                        |
-| **`resultDataPoints`** | <code>string</code>                             | JSON-encoded string containing chart-ready accelerator data points.          |
-| **`warning`**          | <code>{ code: number; message: string; }</code> | Present only when the query hit a deprecated-parameter path (e.g. TimeUnit). |
+| Prop                   | Type                                            | Description                                                                                                                                                                                                                                    |
+| ---------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`results`**          | <code>string</code>                             | JSON-encoded string containing the raw result blocks.                                                                                                                                                                                          |
+| **`resultDataPoints`** | <code>string</code>                             | JSON-encoded string containing chart-ready accelerator data points.                                                                                                                                                                            |
+| **`warning`**          | <code>{ code: string; message: string; }</code> | Present only on Android, and only when `getData()`'s `TimeUnit` parameter is `MILLISECONDS` or `SECONDS` - both are deprecated on Health Connect, so the query silently runs with `TimeUnit: 'MINUTE'` instead. `code` is `OS-PLUG-HLFT-0405`. |
 
 
 #### AdvancedQueryOptions
 
-| Prop             | Type                | Description                                                                                                                                                                                                                                                                                             |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`parameters`** | <code>string</code> | JSON-encoded string containing the full query parameters object (variable, startDate, endDate, timeUnit, operationType, timeUnitLength, advancedQueryReturnType, advancedQueryResultType). Matches the existing Cordova plugin's wire format exactly - a single serialized blob, not individual fields. |
+| Prop             | Type                | Description                                                                                                                                                                                                                                  |
+| ---------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`parameters`** | <code>string</code> | JSON-encoded string containing the full query parameters object (variable, startDate, endDate, timeUnit, operationType, timeUnitLength, advancedQueryReturnType, advancedQueryResultType) - a single serialized blob, not individual fields. |
 
 
 #### WorkoutAdvancedQueryResult
@@ -286,9 +589,9 @@ Android only (see the class-level note on the current iOS/Android parity gap).
 
 #### WorkoutAdvancedQueryOptions
 
-| Prop             | Type                | Description                                                                                                                                                                                               |
-| ---------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`parameters`** | <code>string</code> | JSON-encoded string containing the full workout query parameters object (workoutTypeVariables, startDate, endDate). Matches the existing Cordova plugin's wire format exactly - a single serialized blob. |
+| Prop             | Type                | Description                                                                                                                                    |
+| ---------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`parameters`** | <code>string</code> | JSON-encoded string containing the full workout query parameters object (workoutTypeVariables, startDate, endDate) - a single serialized blob. |
 
 
 #### WriteDataOptions
@@ -308,9 +611,9 @@ Android only (see the class-level note on the current iOS/Android parity gap).
 
 #### SetBackgroundJobOptions
 
-| Prop             | Type                | Description                                                                                                                                                                                                                                                                                                                        |
-| ---------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`parameters`** | <code>string</code> | JSON-encoded string containing the full background job parameters object (variable, timeUnit, timeUnitGrouping, notificationFrequency, notificationFrequencyGrouping, jobFrequency, condition, value, notificationHeader, notificationBody). Matches the existing Cordova plugin's wire format exactly - a single serialized blob. |
+| Prop             | Type                | Description                                                                                                                                                                                                                                                             |
+| ---------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`parameters`** | <code>string</code> | JSON-encoded string containing the full background job parameters object (variable, timeUnit, timeUnitGrouping, notificationFrequency, notificationFrequencyGrouping, jobFrequency, condition, value, notificationHeader, notificationBody) - a single serialized blob. |
 
 
 #### DeleteBackgroundJobOptions
@@ -329,8 +632,8 @@ Android only (see the class-level note on the current iOS/Android parity gap).
 
 #### UpdateBackgroundJobOptions
 
-| Prop             | Type                | Description                                                                                                                                                                                                                                                                          |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **`parameters`** | <code>string</code> | JSON-encoded string containing the full update parameters object (id, notificationFrequency, notificationFrequencyGrouping, condition, value, notificationHeader, notificationBody, isActive). Matches the existing Cordova plugin's wire format exactly - a single serialized blob. |
+| Prop             | Type                | Description                                                                                                                                                                                                               |
+| ---------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`parameters`** | <code>string</code> | JSON-encoded string containing the full update parameters object (id, notificationFrequency, notificationFrequencyGrouping, condition, value, notificationHeader, notificationBody, isActive) - a single serialized blob. |
 
 </docgen-api>
