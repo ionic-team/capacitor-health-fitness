@@ -24,8 +24,7 @@ npx cap sync
 
 ## iOS
 
-The consuming app's `Info.plist` must declare the following (the plugin cannot
-set these on the host app itself):
+The consuming app's `Info.plist` must declare the following (the plugin cannot set these on the host app itself):
 
 ```xml
 <key>NSHealthShareUsageDescription</key>
