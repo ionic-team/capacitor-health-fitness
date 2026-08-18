@@ -240,6 +240,10 @@ console.log(JSON.parse(results ?? '[]'));
 
 ### Writing data
 
+Android only accepts "profile" variables here (`WEIGHT`, `HEIGHT`,
+`BODY_FAT_PERCENTAGE`, `BASAL_METABOLIC_RATE`); iOS accepts most variables
+except category-based ones like `SLEEP`.
+
 ```typescript
 import { HealthFitness } from '@capacitor/health-fitness';
 
@@ -582,9 +586,9 @@ Android only - HealthKit has no equivalent standalone app to open.
 
 #### WorkoutAdvancedQueryResult
 
-| Prop          | Type                |
-| ------------- | ------------------- |
-| **`results`** | <code>string</code> |
+| Prop          | Type                | Description                                           |
+| ------------- | ------------------- | ----------------------------------------------------- |
+| **`results`** | <code>string</code> | JSON-encoded string containing the raw result blocks. |
 
 
 #### WorkoutAdvancedQueryOptions
@@ -596,17 +600,17 @@ Android only - HealthKit has no equivalent standalone app to open.
 
 #### WriteDataOptions
 
-| Prop           | Type                |
-| -------------- | ------------------- |
-| **`variable`** | <code>string</code> |
-| **`value`**    | <code>number</code> |
+| Prop           | Type                | Description                                                                                                                                                                                                                                                                                                                                                                                                      |
+| -------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`variable`** | <code>string</code> | The health/fitness variable to write to. Android only accepts "profile" variables - `WEIGHT`, `HEIGHT`, `BODY_FAT_PERCENTAGE`, `BASAL_METABOLIC_RATE` - any other variable rejects with a "not a profile variable" error. iOS accepts most variables (anything HealthKit represents as a quantity, which includes the profile variables plus most fitness/health ones), except category-based ones like `SLEEP`. |
+| **`value`**    | <code>number</code> | The value to write, in the variable's native unit (e.g. kg for `WEIGHT`).                                                                                                                                                                                                                                                                                                                                        |
 
 
 #### GetLastRecordOptions
 
-| Prop           | Type                |
-| -------------- | ------------------- |
-| **`variable`** | <code>string</code> |
+| Prop           | Type                | Description                                        |
+| -------------- | ------------------- | -------------------------------------------------- |
+| **`variable`** | <code>string</code> | The health/fitness variable to read, e.g. `STEPS`. |
 
 
 #### SetBackgroundJobOptions
@@ -618,9 +622,9 @@ Android only - HealthKit has no equivalent standalone app to open.
 
 #### DeleteBackgroundJobOptions
 
-| Prop     | Type                |
-| -------- | ------------------- |
-| **`id`** | <code>string</code> |
+| Prop     | Type                | Description                                           |
+| -------- | ------------------- | ----------------------------------------------------- |
+| **`id`** | <code>string</code> | The background job's id, from `listBackgroundJobs()`. |
 
 
 #### ListBackgroundJobsResult

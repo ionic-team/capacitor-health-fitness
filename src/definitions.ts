@@ -79,15 +79,28 @@ export interface WorkoutAdvancedQueryOptions {
 }
 
 export interface WorkoutAdvancedQueryResult {
+  /** JSON-encoded string containing the raw result blocks. */
   results: string;
 }
 
 export interface WriteDataOptions {
+  /**
+   * The health/fitness variable to write to.
+   *
+   * Android only accepts "profile" variables - `WEIGHT`, `HEIGHT`,
+   * `BODY_FAT_PERCENTAGE`, `BASAL_METABOLIC_RATE` - any other variable
+   * rejects with a "not a profile variable" error. iOS accepts most
+   * variables (anything HealthKit represents as a quantity, which includes
+   * the profile variables plus most fitness/health ones), except
+   * category-based ones like `SLEEP`.
+   */
   variable: string;
+  /** The value to write, in the variable's native unit (e.g. kg for `WEIGHT`). */
   value: number;
 }
 
 export interface GetLastRecordOptions {
+  /** The health/fitness variable to read, e.g. `STEPS`. */
   variable: string;
 }
 
@@ -102,6 +115,7 @@ export interface SetBackgroundJobOptions {
 }
 
 export interface DeleteBackgroundJobOptions {
+  /** The background job's id, from `listBackgroundJobs()`. */
   id: string;
 }
 
