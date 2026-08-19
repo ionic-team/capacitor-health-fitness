@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/ionic-team/capacitor-health-fitness/compare/v1.0.0...v1.0.1) (2026-08-19)
+
+
+### Bug Fixes
+
+* properly handle workoutVariables and doc updates ([#3](https://github.com/ionic-team/capacitor-health-fitness/issues/3)) ([823c093](https://github.com/ionic-team/capacitor-health-fitness/commit/823c0934e53cab6dc40e4bed790c8d988c25557f))
+
 # 1.0.0 (2026-08-17)
 
 
