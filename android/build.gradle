@@ -31,8 +31,8 @@ if (project.extensions.findByName('kotlin') == null) {
 }
 if (System.getenv("CAP_PLUGIN_PUBLISH") == "true") {
     apply plugin: 'io.github.gradle-nexus.publish-plugin'
-    apply from: file('../../scripts/android/publish-root.gradle')
-    apply from: file('../../scripts/android/publish-module.gradle')
+    apply from: file('../scripts/android/publish-root.gradle')
+    apply from: file('../scripts/android/publish-module.gradle')
 }
 
 android {
