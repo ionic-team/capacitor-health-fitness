@@ -35,8 +35,7 @@ export interface RequestHealthPermissionsOptions {
   profileVariables: string;
   /**
    * JSON-encoded string: `{"IsActive": boolean, "AccessType": "READ" | "WRITE" | "READWRITE"}`.
-   * Requests permission for HealthKit's workout type, needed for
-   * `getWorkoutData()`.
+   * Requests permission for HealthKit's workout type, needed for `getWorkoutData()`.
    *
    * iOS only - not supported on Android (`getWorkoutData()` is iOS only;
    * this field is never read there).
@@ -203,8 +202,7 @@ export interface HealthFitnessPlugin {
   /**
    * Revokes all Health Connect permissions previously granted to the app.
    *
-   * Android only - HealthKit has no equivalent API for an app to revoke its
-   * own access.
+   * Android only - HealthKit has no equivalent API for an app to revoke its own access.
    *
    * @since 1.0.0
    */

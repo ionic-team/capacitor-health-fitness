@@ -24,8 +24,8 @@ npx cap sync
 
 ## iOS
 
-The consuming app's `Info.plist` must declare the following (the plugin cannot
-set these on the host app itself):
+Your app's `Info.plist` must declare the following (the plugin cannot set
+these on the host app itself):
 
 ```xml
 <key>NSHealthShareUsageDescription</key>
@@ -43,29 +43,42 @@ set these on the host app itself):
 </array>
 ```
 
+- `NSHealthShareUsageDescription` / `NSHealthUpdateUsageDescription`: the
+  messages HealthKit shows the user when requesting read / write access.
+- `UIBackgroundModes` (`fetch`, `processing`) and
+  `BGTaskSchedulerPermittedIdentifiers`: needed for `setBackgroundJob`'s
+  background job feature.
+
 The app target also needs the **HealthKit** capability enabled, with the
 following entitlements set to `true` (both Debug and Release):
 
-- `com.apple.developer.healthkit`
-- `com.apple.developer.healthkit.background-delivery`
-- `com.apple.developer.healthkit.recalibrate-estimates`
+- `com.apple.developer.healthkit`: the base entitlement required for any
+  HealthKit access at all.
+- `com.apple.developer.healthkit.background-delivery`: needed for
+  `setBackgroundJob`'s background job feature.
+- `com.apple.developer.healthkit.recalibrate-estimates`: needed to read/write
+  HealthKit's on-device "estimate" variables, e.g. `WALKING_SPEED` and VO2 max.
 
-and an empty array for `com.apple.developer.healthkit.access`.
+`com.apple.developer.healthkit.access` should be set to an empty array - it
+lists any additional restricted HealthKit types beyond the default set, and
+this plugin doesn't use any.
+
+Read about [Configuring `Info.plist`](https://capacitorjs.com/docs/ios/configuration#configuring-infoplist) in the [iOS Guide](https://capacitorjs.com/docs/ios) for more information on setting iOS permissions in Xcode
 
 ## Android
 
-This plugin ships a `capacitor:sync:after` hook (`hooks/capacitorCopyHealthFitnessConfigs.js`)
-that runs on every `npx cap sync`/`npx cap update` and edits the consuming
-app's generated `android/app/src/main/AndroidManifest.xml` to declare the
-Health Connect permissions the app actually needs. Health Connect permissions
+This plugin ships a `capacitor:sync:after` hook
+(`hooks/capacitorCopyHealthFitnessConfigs.js`) that runs on every
+`npx cap sync` and edits your app's generated
+`android/app/src/main/AndroidManifest.xml` to declare the
+Health Connect permissions your app actually needs. Health Connect permissions
 cannot be requested at runtime the way Capacitor's `plugins.<Name>` config
 values are read - they must exist in the manifest at build time - hence the
 sync-time hook instead of `getConfig()`.
 
 ### Declaring permissions
 
-Create `android/healthfitness.config.json` in the consuming app (next to
-`android/app/`):
+In your app, create an `android/healthfitness.config.json` file (next to `android/app/`):
 
 ```json
 {
@@ -94,13 +107,15 @@ Create `android/healthfitness.config.json` in the consuming app (next to
 }
 ```
 
-Each value is one of `Read`, `Write`, or `ReadWrite`. Both files are optional
+Each value is one of `Read`, `Write`, or `ReadWrite` - this casing is
+intentional and distinct from `requestHealthPermissions`'s `AccessType`
+(`READ`/`WRITE`/`READWRITE`), since this file is parsed by the sync-time hook
+above, not read by the native plugin at runtime. Both files are optional
 per key - only declare what the app actually uses. If neither
 `healthfitness.config.json` nor any key in it is present, the hook falls back
 to declaring **every** Health Connect permission (matching the plugin's
-previous, non-configurable behavior) so a consuming app that skips
-configuration still works, at the cost of declaring more permissions than it
-needs.
+previous, non-configurable behavior) so your app still works even if you
+skip configuration, at the cost of declaring more permissions than it needs.
 
 ### Background jobs and read-history permissions
 
@@ -125,7 +140,7 @@ top-level flags in `android/healthfitness.config.json`:
 ### Background notification content
 
 `setBackgroundJob`'s foreground notification title/description are read from
-the consuming app's `res/values/strings.xml` (`background_notification_title`
+your app's `res/values/strings.xml` (`background_notification_title`
 / `background_notification_description`) - and read unconditionally at plugin
 load time (app startup), not just when a background job is actually set, so
 a missing value crashes the app immediately rather than only when the feature
@@ -157,8 +172,9 @@ file. The simplest way to set it is directly in
 If `privacyPolicyUrl` isn't set, the hook falls back to deriving one from
 `capacitor.config.json`'s `server.url` + a fixed `HealthConnect_PrivacyPolicy.txt`
 filename - only useful for apps that already serve their web content from a
-remote server and host that file there (`www/HealthConnect_PrivacyPolicy.txt`,
-copied to `android/app/src/main/assets/public/` by `cap sync`). Most Capacitor
+remote server and host that file there (`HealthConnect_PrivacyPolicy.txt` in
+your app's `webDir`, copied to `android/app/src/main/assets/public/` by
+`cap sync`). Most Capacitor
 apps bundle their web assets locally and have no `server.url`, so this
 fallback will never resolve for them - use `privacyPolicyUrl` directly
 instead.
@@ -186,8 +202,7 @@ JSON-encoded `{ IsActive, AccessType }` descriptor (`AccessType` is `READ`,
   `OXYGEN_SATURATION`, `BODY_TEMPERATURE`
 - **Profile:** `WEIGHT`, `HEIGHT`, `BODY_FAT_PERCENTAGE`,
   `BASAL_METABOLIC_RATE`
-- **Workout** (iOS only): HealthKit's workout type, needed for
-  `getWorkoutData()`
+- **Workout** (iOS only): HealthKit's workout type, needed for `getWorkoutData()`
 
 Setting `allVariables`'s `IsActive` to `true` requests every variable at
 once (this already includes workout on iOS). Use `workoutVariables` on its
@@ -534,8 +549,7 @@ disconnectFromHealthConnect() => Promise<void>
 
 Revokes all Health Connect permissions previously granted to the app.
 
-Android only - HealthKit has no equivalent API for an app to revoke its
-own access.
+Android only - HealthKit has no equivalent API for an app to revoke its own access.
 
 **Since:** 1.0.0
 
@@ -640,8 +654,8 @@ Android only - HealthKit has no equivalent standalone app to open.
 
 #### UpdateBackgroundJobOptions
 
-| Prop             | Type                | Description                                                                                                                                                                                                               |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`parameters`** | <code>string</code> | JSON-encoded string containing the full update parameters object (id, notificationFrequency, notificationFrequencyGrouping, condition, value, notificationHeader, notificationBody, isActive) - a single serialized blob. |
+| Prop             | Type                | Description                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ---------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`parameters`** | <code>string</code> | JSON-encoded string containing the full update parameters object (id, notificationFrequency, notificationFrequencyGrouping, condition, value, notificationHeader, notificationBody, isActive) - a single serialized blob. `isActive` is the string `"true"`/`"false"` here, unlike the boolean `IsActive` used in `requestHealthPermissions`'s descriptors - matches the existing Cordova plugin's convention for this method. |
 
 </docgen-api>
