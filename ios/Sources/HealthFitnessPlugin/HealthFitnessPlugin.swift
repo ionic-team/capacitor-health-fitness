@@ -24,7 +24,7 @@ public class HealthFitnessPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "setBackgroundJob", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deleteBackgroundJob", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "listBackgroundJobs", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "updateBackgroundJob", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "updateBackgroundJob", returnType: CAPPluginReturnPromise)
     ]
 
     private let implementation = HealthFitness()
@@ -66,7 +66,7 @@ public class HealthFitnessPlugin: CAPPlugin, CAPBridgedPlugin {
         let codeString = (error as NSError?).map { "OS-PLUG-HLFT-" + String(format: "%04d", $0.code) }
         call.reject(message, codeString, error, [
             "code": codeString ?? "",
-            "message": message,
+            "message": message
         ])
     }
 
