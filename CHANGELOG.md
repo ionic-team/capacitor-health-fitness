@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/ionic-team/capacitor-health-fitness/compare/v1.0.1...v1.0.2) (2026-10-07)
+
+
+### Bug Fixes
+
+* **ios:** update native lib to latest version ([#8](https://github.com/ionic-team/capacitor-health-fitness/issues/8)) ([705aed0](https://github.com/ionic-team/capacitor-health-fitness/commit/705aed09b384cd27df97bdc77b06cb7315681348))
+
 ## [1.0.1](https://github.com/ionic-team/capacitor-health-fitness/compare/v1.0.0...v1.0.1) (2026-08-19)
 
 
