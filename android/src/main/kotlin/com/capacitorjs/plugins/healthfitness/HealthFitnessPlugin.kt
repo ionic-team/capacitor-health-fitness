@@ -367,14 +367,14 @@ class HealthFitnessPlugin : Plugin() {
         if (status != ConnectionResult.SUCCESS) {
             val result = if (googleApiAvailability.isUserResolvableError(status)) {
                 googleApiAvailability.getErrorDialog(activity, status, 1)?.show()
-                Pair(
-                    formatErrorCode(HealthFitnessError.GOOGLE_SERVICES_RESOLVABLE_ERROR.code),
-                    HealthFitnessError.GOOGLE_SERVICES_RESOLVABLE_ERROR.message
+                mapOf(
+                    "first" to formatErrorCode(HealthFitnessError.GOOGLE_SERVICES_RESOLVABLE_ERROR.code),
+                    "second" to HealthFitnessError.GOOGLE_SERVICES_RESOLVABLE_ERROR.message
                 )
             } else {
-                Pair(
-                    formatErrorCode(HealthFitnessError.GOOGLE_SERVICES_ERROR.code),
-                    HealthFitnessError.GOOGLE_SERVICES_ERROR.message
+                mapOf(
+                    "first" to formatErrorCode(HealthFitnessError.GOOGLE_SERVICES_ERROR.code),
+                    "second" to HealthFitnessError.GOOGLE_SERVICES_ERROR.message
                 )
             }
             sendSuccess(call, result)
