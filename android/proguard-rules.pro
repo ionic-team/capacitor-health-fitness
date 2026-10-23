@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# ionhealthfitness-android brings Room 2.5.1 and WorkManager 2.9.0, which lose these constructors under AGP 9.
+-keep class * extends androidx.room.RoomDatabase { <init>(); }
+-keepclassmembers class * extends androidx.work.InputMerger { <init>(); }
