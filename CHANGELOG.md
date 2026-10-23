@@ -1,3 +1,10 @@
+## [1.0.3-next.1](https://github.com/ionic-team/capacitor-health-fitness/compare/v1.0.2...v1.0.3-next.1) (2026-10-23)
+
+
+### Bug Fixes
+
+* remove "prepare" for NPM 12 ([8bef0fc](https://github.com/ionic-team/capacitor-health-fitness/commit/8bef0fcdfd58f5fec92c0c6eff28f19a36e6b007))
+
 ## [1.0.2](https://github.com/ionic-team/capacitor-health-fitness/compare/v1.0.1...v1.0.2) (2026-10-07)
 
 
