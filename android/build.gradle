@@ -67,6 +67,15 @@ kotlin {
     jvmToolchain(21)
 }
 
+// RMET-5348 TEST ONLY - do not merge: resolve the locally built native library bundled in this plugin (android/local-maven).
+// Registered on every project because the app project resolves the plugin's dependencies with its own repositories.
+def rmet5348LocalMaven = uri("$projectDir/local-maven")
+rootProject.allprojects {
+    repositories {
+        maven { url rmet5348LocalMaven }
+    }
+}
+
 repositories {
     google()
     mavenCentral()
@@ -86,7 +95,7 @@ dependencies {
     implementation "androidx.core:core-ktx:$androidxCoreKTXVersion"
 
     // Shared native business logic - same library the Cordova plugin depends on.
-    implementation "io.ionic.libs:ionhealthfitness-android:1.0.1"
+    implementation "io.ionic.libs:ionhealthfitness-android:99.0.0-rmet5348"
 
     implementation "com.google.android.gms:play-services-auth:19.2.0"
     implementation "com.google.code.gson:gson:2.13.2"

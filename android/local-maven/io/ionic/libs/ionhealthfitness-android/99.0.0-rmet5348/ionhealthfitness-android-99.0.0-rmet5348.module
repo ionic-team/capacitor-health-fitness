@@ -1,0 +1,187 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "io.ionic.libs",
+    "module": "ionhealthfitness-android",
+    "version": "99.0.0-rmet5348",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.14.3"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseVariantReleaseApiPublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.25"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ionhealthfitness-android-99.0.0-rmet5348.aar",
+          "url": "ionhealthfitness-android-99.0.0-rmet5348.aar",
+          "size": 396628,
+          "sha512": "379258d5ac3976155a0e7b31cf0bee36d9bd38c06697ca7ea03c42de8334a3539bbdaaf115f8650f2c16adb8d2fb90e97ab097fa7f4de005c552185efca47228",
+          "sha256": "2747115ffabb1b2a96157ddc70fe14f49e478f471c88813834fc34338c9d7943",
+          "sha1": "b22d46cc71ce10542cd955b5533245f471e792ee",
+          "md5": "b245c9f22fc86689b9801f956ce0c09a"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseRuntimePublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.16.0"
+          }
+        },
+        {
+          "group": "com.google.android.gms",
+          "module": "play-services-location",
+          "version": {
+            "requires": "21.3.0"
+          }
+        },
+        {
+          "group": "com.google.code.gson",
+          "module": "gson",
+          "version": {
+            "requires": "2.13.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core-jvm",
+          "version": {
+            "requires": "1.9.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-android",
+          "version": {
+            "requires": "1.9.0"
+          }
+        },
+        {
+          "group": "androidx.activity",
+          "module": "activity-ktx",
+          "version": {
+            "requires": "1.10.1"
+          }
+        },
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.7.1"
+          }
+        },
+        {
+          "group": "androidx.health.connect",
+          "module": "connect-client",
+          "version": {
+            "requires": "1.1.0-beta01"
+          }
+        },
+        {
+          "group": "androidx.work",
+          "module": "work-runtime-ktx",
+          "version": {
+            "requires": "2.10.5"
+          }
+        },
+        {
+          "group": "androidx.activity",
+          "module": "activity-compose",
+          "version": {
+            "requires": "1.10.1"
+          }
+        },
+        {
+          "group": "androidx.compose.material3",
+          "module": "material3",
+          "version": {
+            "requires": "1.3.1"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-viewmodel-compose",
+          "version": {
+            "requires": "2.7.0"
+          }
+        },
+        {
+          "group": "androidx.room",
+          "module": "room-runtime",
+          "version": {
+            "requires": "2.6.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.25"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ionhealthfitness-android-99.0.0-rmet5348.aar",
+          "url": "ionhealthfitness-android-99.0.0-rmet5348.aar",
+          "size": 396628,
+          "sha512": "379258d5ac3976155a0e7b31cf0bee36d9bd38c06697ca7ea03c42de8334a3539bbdaaf115f8650f2c16adb8d2fb90e97ab097fa7f4de005c552185efca47228",
+          "sha256": "2747115ffabb1b2a96157ddc70fe14f49e478f471c88813834fc34338c9d7943",
+          "sha1": "b22d46cc71ce10542cd955b5533245f471e792ee",
+          "md5": "b245c9f22fc86689b9801f956ce0c09a"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseSourcePublication",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "ionhealthfitness-android-99.0.0-rmet5348-sources.jar",
+          "url": "ionhealthfitness-android-99.0.0-rmet5348-sources.jar",
+          "size": 73818,
+          "sha512": "b368999cb69b3606b1d9d6aea2c1931aca6007a4ddb5e3b475931e8365a278d0aee2dede891ee515c68a5ff4b0dca395259a4715898dd90fa01bde87310a5246",
+          "sha256": "e64e6202b8ef9bd0392c09137b34fa094c1a1f93d59e7aeeb9a2014f675117a7",
+          "sha1": "db58bf05cd3a840790d75376fb691d0803afe79a",
+          "md5": "9044ccc96a9070dbbc453d0f716a37ba"
+        }
+      ]
+    }
+  ]
+}
