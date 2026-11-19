@@ -15,7 +15,8 @@
     "ios/Tests",
     "Package.swift",
     "CapacitorHealthFitness.podspec",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "android/proguard-rules.pro"
   ],
   "author": "Ionic Team <hi@ionic.io>",
   "license": "MIT",
@@ -55,10 +56,10 @@
     "@babel/preset-typescript": "^7.27.0"
   },
   "devDependencies": {
-    "@capacitor/android": "^8.0.0",
-    "@capacitor/core": "^8.0.0",
+    "@capacitor/android": "next",
+    "@capacitor/core": "next",
     "@capacitor/docgen": "^0.3.1",
-    "@capacitor/ios": "^8.0.0",
+    "@capacitor/ios": "next",
     "@ionic/eslint-config": "^0.5.0",
     "@ionic/prettier-config": "^4.0.0",
     "@ionic/swiftlint-config": "^2.0.0",
@@ -76,7 +77,7 @@
     "semantic-release": "^25.0.2"
   },
   "peerDependencies": {
-    "@capacitor/core": ">=8.0.0"
+    "@capacitor/core": ">=9.0.0-rc.0"
   },
   "prettier": "@ionic/prettier-config",
   "swiftlint": "@ionic/swiftlint-config",
