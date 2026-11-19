@@ -1,3 +1,11 @@
+## [1.0.3](https://github.com/ionic-team/capacitor-health-fitness/compare/v1.0.2...v1.0.3) (2026-11-19)
+
+
+### Bug Fixes
+
+* **android:** keep strings read by name when shrinking resources ([f81074f](https://github.com/ionic-team/capacitor-health-fitness/commit/f81074f298e7e15a072f97ee32499fa576806715))
+* **android:** support R8 in release builds ([acfa943](https://github.com/ionic-team/capacitor-health-fitness/commit/acfa943992214f063102ec2f6be039b0f3cbba64))
+
 ## [1.0.2](https://github.com/ionic-team/capacitor-health-fitness/compare/v1.0.1...v1.0.2) (2026-10-07)
 
 
