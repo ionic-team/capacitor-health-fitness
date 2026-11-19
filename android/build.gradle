@@ -35,8 +35,6 @@ android {
     compileSdk = project.hasProperty('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 37
     defaultConfig {
         consumerProguardFiles "proguard-rules.pro"
-        // ion-android-healthfitness requires minSdk 26 - keep this default at
-        // or above that even when the consuming app hasn't overridden it.
         minSdkVersion project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 26
         versionCode 1
         versionName "1.0"
