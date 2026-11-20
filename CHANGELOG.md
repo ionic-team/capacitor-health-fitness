@@ -1,3 +1,10 @@
+# [1.1.0-next.2](https://github.com/ionic-team/capacitor-health-fitness/compare/v1.1.0-next.1...v1.1.0-next.2) (2026-11-20)
+
+
+### Bug Fixes
+
+* **android:** avoid implicit parent project property lookup deprecated in Gradle 9 ([#17](https://github.com/ionic-team/capacitor-health-fitness/issues/17)) ([16d1350](https://github.com/ionic-team/capacitor-health-fitness/commit/16d13508e5ce4f919edd04b01d3b2b8359987244))
+
 # [1.1.0-next.1](https://github.com/ionic-team/capacitor-health-fitness/compare/v1.0.3-next.1...v1.1.0-next.1) (2026-11-19)
 
 
