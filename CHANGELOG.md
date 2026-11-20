@@ -1,3 +1,15 @@
+# [2.0.0-next.1](https://github.com/ionic-team/capacitor-health-fitness/compare/v1.1.0-next.2...v2.0.0-next.1) (2026-11-20)
+
+
+### Bug Fixes
+
+* remove outdated comment ([#16](https://github.com/ionic-team/capacitor-health-fitness/issues/16)) ([f47d2ed](https://github.com/ionic-team/capacitor-health-fitness/commit/f47d2edb1310f1814e2f3d0b24b95d02b63fd37d))
+
+
+### BREAKING CHANGES
+
+* Align plugin baselines with Capacitor 9
+
 # [1.1.0-next.2](https://github.com/ionic-team/capacitor-health-fitness/compare/v1.1.0-next.1...v1.1.0-next.2) (2026-11-20)
 
 
