@@ -1,3 +1,10 @@
+# [2.0.0-next.4](https://github.com/ionic-team/capacitor-health-fitness/compare/v2.0.0-next.3...v2.0.0-next.4) (2026-11-27)
+
+
+### Bug Fixes
+
+* **android:** update proguard rules via native lib ([#20](https://github.com/ionic-team/capacitor-health-fitness/issues/20)) ([3343938](https://github.com/ionic-team/capacitor-health-fitness/commit/33439382affe34df3a556e2447c926f21498c5e4))
+
 # [2.0.0-next.3](https://github.com/ionic-team/capacitor-health-fitness/compare/v2.0.0-next.2...v2.0.0-next.3) (2026-11-27)
 
 
