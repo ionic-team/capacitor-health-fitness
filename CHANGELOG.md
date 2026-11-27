@@ -1,3 +1,10 @@
+# [2.0.0-next.3](https://github.com/ionic-team/capacitor-health-fitness/compare/v2.0.0-next.2...v2.0.0-next.3) (2026-11-27)
+
+
+### Bug Fixes
+
+* **android:** bump ionhealthfitness-android to 1.0.2 ([#18](https://github.com/ionic-team/capacitor-health-fitness/issues/18)) ([be98ff1](https://github.com/ionic-team/capacitor-health-fitness/commit/be98ff12781d79aebba797ae634eb9b839704948))
+
 # [2.0.0-next.2](https://github.com/ionic-team/capacitor-health-fitness/compare/v2.0.0-next.1...v2.0.0-next.2) (2026-11-27)
 
 
