@@ -1,3 +1,11 @@
+## [1.0.4](https://github.com/ionic-team/capacitor-health-fitness/compare/v1.0.3...v1.0.4) (2026-11-27)
+
+
+### Bug Fixes
+
+* **android:** bump ionhealthfitness-android to 1.0.2 ([#18](https://github.com/ionic-team/capacitor-health-fitness/issues/18)) ([be98ff1](https://github.com/ionic-team/capacitor-health-fitness/commit/be98ff12781d79aebba797ae634eb9b839704948))
+* **android:** update proguard rules via native lib ([#20](https://github.com/ionic-team/capacitor-health-fitness/issues/20)) ([3343938](https://github.com/ionic-team/capacitor-health-fitness/commit/33439382affe34df3a556e2447c926f21498c5e4))
+
 ## [1.0.3](https://github.com/ionic-team/capacitor-health-fitness/compare/v1.0.2...v1.0.3) (2026-11-19)
 
 
